@@ -15,7 +15,12 @@ class Floor {
         };
         
         vector<vector<struct Tile*>> tiles_p;   /* store pointer to each tile on the floor */
-    
+        
+
+        /* To Do */
+        // eventually store a desired direction from the position
+        // as it the direction is just the function of where 
+        // the agent it.
     public:
         Floor(int w, int h):width{w}, height{h} {
             for(int y = 0; y < height; y++) {
