@@ -4,14 +4,17 @@
 #include <vector>
 #include "Floor.h"
 #include <limits>
-
+#define inf std::numeric_limits<int>::infinity()
 using namespace std;
 
-class Graph : public Floor {
+class Graph{
 
 	private:
-		Floor* floor_p;
+		// Floor *floor_p;
+		int width;
+		int height;
 		struct Node {
+			char color;
 			int distance;
 		    Node* east;
 		    Node* west;
@@ -22,15 +25,17 @@ class Graph : public Floor {
 		    Node* north_west;
 		    Node* south_west;
 		};
-		vector<struct Node*> nodes_p;
+		vector< vector<struct Node*> > nodes_p; 
+		// vector<struct Node*> nodes_p;
 		int generate_nodes() {
-			for(int row = 0; row < floor_plan->height; row++) {
-				for(int col = 0; col < floor_plan->width; col++) {
-					if (floor_plan->tiles_p[row][col]-> color = 0) {	//code-rem
-						Node node;
-						node.distance = inf;
-						nodes_p.push_back(&node);
+			for(int row = 0; row < floor_p->height; row++) {
+				for(int col = 0; col < floor_p->width; col++) {
+					Node node;
+					node.color = (row + col)%32000;
+					if (node.color != 0) {	//code-rem color for black = 0 for now.
+						
 					}
+					nodes_p[row][col] = &node;
 				}
 			} 
 		};
@@ -42,7 +47,7 @@ class Graph : public Floor {
 		};
 
 	public:
-		Graph(Floor* f) : floor_p{f}{
+		Graph(w, h) : width{w}, height{h}{
 			generate_nodes();
 			connect_nodes();
 		};

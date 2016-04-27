@@ -7,7 +7,8 @@
 using namespace std;
 
 class Floor {
-    protected:
+    //eventually protected
+    public:
         int width, height;  /* width and height of the floor*/
         struct Tile{        /* each unit of the floor is modelled as a tile */
             int row, col;       /* co-ordinate of the tile on the floor. code-yellow*/
