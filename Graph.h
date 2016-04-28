@@ -7,14 +7,13 @@
 #define inf std::numeric_limits<int>::infinity()
 using namespace std;
 
-class Graph{
+class Graph : public Floor{
 
 	private:
-		// Floor *floor_p;
-		int width;
-		int height;
+		Floor *floor_p;
+		// int width;
+		// int height;
 		struct Node {
-			char color;
 			int distance;
 		    Node* east;
 		    Node* west;
@@ -47,7 +46,7 @@ class Graph{
 		};
 
 	public:
-		Graph(w, h) : width{w}, height{h}{
+		Graph(Floop *f): floor_p{f} {
 			generate_nodes();
 			connect_nodes();
 		};

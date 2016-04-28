@@ -149,12 +149,6 @@ int main() {
         //set south-west
         a[row][row+width-1] = ( (row+width < V-1 ) &&  (row-1 > 0) && ( row%width != 0) )? 2 : 0;
     }
-	for(int i = 0; i < V; i++) {
-		for(int j = 0; j < V; j++){
-			cout << a[i][j] << "\t";
-		}
-		cout << endl;
-	}
     dijkstra(a, 0);
  	cout << endl;
     return 0;
