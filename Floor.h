@@ -15,7 +15,6 @@ class Floor {
         };
         vector< vector<struct Tile> > tiles; /* Array of tiles on the floor */
     public:
-
         struct desired_direction{
             char x;
             char y;
