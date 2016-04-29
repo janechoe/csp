@@ -16,8 +16,12 @@ int main() {
     f.set_values("sample.txt");
     cout << f.get_width() << endl; 
     cout << f.get_height() << endl;
-    // cout << f.get_tile_color(0,0) << endl; 
     Graph g;
-    g.set_values(f);
+    g.set_floor(f);
+    g.dijkstra();
+    vector<float> dist = g.dijkstra();
+    for(int i = 0; i < f.get_width()*f.get_height(); i++) {
+    	cout << dist[i] << "\t";
+    } 
     return 0;
 }
