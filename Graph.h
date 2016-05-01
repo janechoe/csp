@@ -92,15 +92,14 @@ int Graph::dijkstra() {
 	for( int vertex = 0; vertex < AREA-1; vertex++ ) {
 		if (SELF_COLOR) {
 			int starting_vertex = pick_starting_vertex();
-			cout << starting_vertex << endl;
 			was_processed[starting_vertex] = true;
 			update_neighbours(starting_vertex);
 			update_distance_to_neighbours(starting_vertex);
 			for(int direction = 1; direction <= 8; direction++) {
 				if ( (neighbours[direction] != -1) && !was_processed[neighbours[direction]] 
-					&& ( (distance_from_source[starting_vertex]+distance_to_neighbour[direction]) < distance_from_source[neighbours[direction]]) ) {
+					&& ( (distance_from_source[starting_vertex]+distance_to_neighbour[direction]) <= /* rem probable error */ distance_from_source[neighbours[direction]]) ) {
 					distance_from_source[neighbours[direction]] = distance_from_source[starting_vertex] + distance_to_neighbour[direction];
-					prev_vertex[vertex] = starting_vertex;
+					prev_vertex[neighbours[direction]] = starting_vertex;					
 				}		
 			}
 		}
@@ -149,25 +148,16 @@ int Graph::update_distance_to_neighbours(int vertex) {
 };
 
 void Graph::see_stuff() {
-	for (int row = 0 ; row < HEIGHT; row++) {
-        for (int col = 0; col < WIDTH; col++) {
-            cout << current_floor.get_tile_color(row, col) << "\t";
-        } cout << endl;
-    } cout << endl;
+	cout << endl;
     for (int row = 0 ; row < HEIGHT; row++) {
         for (int col = 0; col < WIDTH; col++) {
             cout << (row * WIDTH + col) << "\t";
-        } cout << endl;
+        } cout << "\v" << endl;
     } cout << endl;
     for (int row = 0 ; row < HEIGHT; row++) {
         for (int col = 0; col < WIDTH; col++) {
             cout << prev_vertex[row * WIDTH + col] << "\t";
-        } cout << endl;
-    } cout << endl;
-    for (int row = 0 ; row < HEIGHT; row++) {
-        for (int col = 0; col < WIDTH; col++) {
-            cout << distance_from_source[row * WIDTH + col] << "\t";
-        } cout << endl;
+        } cout << "\v" << endl;
     } cout << endl;
 
 }
