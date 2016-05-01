@@ -9,11 +9,9 @@ using namespace std;
 int main() {
     //initiate the floor
     Floor f;
-    f.set_values("sample2.txt");
+    f.set_values("sample.txt");
     Graph g;
-    g.set_floor(&f);
-    cout << "before the find_route is called" << &f << endl;
+    g.set_floor(f);
     g.find_route();
-    cout << "after the find_route is called " << &f << &g << endl;
     return 0;
 }

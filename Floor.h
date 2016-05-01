@@ -7,7 +7,7 @@
 using namespace std;
 
 class Floor {
-    // friend class Graph;
+    friend class Graph;
     private:
         int width, height;
         struct Tile{        /* each unit of the floor is modelled as a tile */

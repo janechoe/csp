@@ -8,15 +8,15 @@
 
 #define inf std::numeric_limits<float>::infinity()
 
-#define WIDTH 	(current_floor->get_width())
-#define HEIGHT 	(current_floor->get_height())
+#define WIDTH 	(current_floor.width)
+#define HEIGHT 	(current_floor.height)
 #define AREA 	(WIDTH * HEIGHT)
 
 #define ROW	(vertex/WIDTH)
 #define COL (vertex%WIDTH)
 
-#define SELF_COLOR (current_floor->get_tile_color(ROW, COL))
-#define COLOR(r,c) (current_floor->get_tile_color(r,c))
+#define SELF_COLOR (current_floor.get_tile_color(ROW, COL))
+#define COLOR(r,c) (current_floor.get_tile_color(r,c))
 // #define GET_MACRO(_1, _2, COLOR,...) COLOR
 // #define COLOR(...) GET_MACRO(__VA_ARGS__, COLOR2, COLOR1)(__VA_ARGS__)
 //http://stackoverflow.com/questions/11761703/overloading-macro-on-number-of-arguments
@@ -60,7 +60,7 @@ using namespace std;
 class Graph {
 
 	private: 
-		Floor *current_floor;
+		Floor current_floor;
 		int reset_graph();
 		int update_graph(int);
 		int generate_node(int, char);
@@ -69,6 +69,7 @@ class Graph {
 		};
 		vector<int> prev_vertex; 
 		vector<float> distance;
+		vector<bool>  was_visited;
 		//	NW	N   NE
 		//	W 	i 	E
 		// 	SW 	S 	SE
@@ -77,9 +78,9 @@ class Graph {
 
 	public:
 		 int print_graph();
-		 int set_floor(Floor *);
+		 int set_floor(Floor);
 		 int find_route();
-		 int dijkstra(); 
+		 int dijkstra(int); 
 		 Graph() {};
 		~Graph() {
 			cout << "Deleting a graph object" << endl;
@@ -94,10 +95,11 @@ int Graph::reset_graph() {
 	}
 }
 
-int Graph::set_floor(Floor *f) {
+int Graph::set_floor(Floor f) {
 	current_floor = f;
-	prev_vertex = vector<int> (WIDTH, -1);
-	distance = vector<float> (WIDTH, inf );
+	prev_vertex = vector<int> (AREA, -1);
+	distance = vector<float> (AREA, inf);
+	was_visited = vector<bool> (AREA, false);
 	distance[0] = 0;
 	prev_vertex[0] = 0;	
 	//process a vector of 9xAREA
@@ -112,45 +114,42 @@ int Graph::find_route(){
 		if (SELF_COLOR) {
 			reset_graph();
 			update_graph(vertex);
-			// dijkstra();			
+			dijkstra(vertex);			
 		}
 	}
-	reset_graph(); 
 	cout << "voila" << endl;
 	return 0;
 };
 
 int Graph::generate_node(int vertex, char dir) {
-	cout << "generate_node called with vertex = " << vertex << endl; 
-	// vector<float> node(AREA);
-	graph[dir][WEST_VERTEX] 		= (WEST_IS_VALID) ? 1 : 0;
-	graph[dir][NORTHWEST_VERTEX]	= (NORTHWEST_IS_VALID) ? 1.414 : 0;
-	graph[dir][NORTH_VERTEX]		= (NORTH_IS_VALID) ? 1 : 0;	
-	graph[dir][NORTHEAST_VERTEX]	= (NORTHEAST_IS_VALID) ? 1.414 : 0;
-	graph[dir][EAST_VERTEX] 		= (EAST_IS_VALID) ? 1 : 0;
-	graph[dir][SOUTHEAST_VERTEX]  = (SOUTHEAST_IS_VALID) ?  1.414 : 0;
-	graph[dir][SOUTH_VERTEX] 		= (SOUTH_IS_VALID) ? 1 : 0;
-	graph[dir][SOUTHWEST_VERTEX]  = (SOUTHWEST_IS_VALID) ? 1.414 : 0;
+	// cout << "generate graph called with vertex " << vertex ;
+	if (WEST_IS_VALID) 		graph[dir][WEST_VERTEX] 	 = 1;
+	if (NORTHWEST_IS_VALID) graph[dir][NORTHWEST_VERTEX] = 1.414;
+	if (NORTH_IS_VALID) 	graph[dir][NORTH_VERTEX] 	 = 1;
+	if (NORTHEAST_IS_VALID) graph[dir][NORTHEAST_VERTEX] = 1.414;
+	if (EAST_IS_VALID)		graph[dir][EAST_VERTEX] 	 = 1;
+	if (SOUTHEAST_IS_VALID) graph[dir][SOUTHEAST_VERTEX] = 1.414;
+	if (SOUTH_IS_VALID)		graph[dir][SOUTH_VERTEX] 	 = 1;
+	if (SOUTHWEST_IS_VALID)	graph[dir][SOUTHWEST_VERTEX] = 1.414;
 	return 0;
 };
 
 int Graph::update_graph(int vertex) {
-	cout << endl << "update_graph called with vertex = " << vertex << " for row = "<< ROW << " and col = " << COL << endl;
+	cout << vertex << endl;
+	// cout << endl << "update_graph called with vertex = " << vertex << " for row = "<< ROW << " and col = " << COL << endl;
 	generate_node(vertex, CENTER);
-	if (WEST_IS_VALID) generate_node(WEST_VERTEX, WEST);	
+	if (WEST_IS_VALID) 		generate_node(WEST_VERTEX, WEST);	
 	if (NORTHWEST_IS_VALID) generate_node(NORTHWEST_VERTEX, NORTHWEST);
-	if (NORTH_IS_VALID) generate_node(NORTH_VERTEX, NORTH);
+	if (NORTH_IS_VALID) 	generate_node(NORTH_VERTEX, NORTH);
 	if (NORTHEAST_IS_VALID) generate_node(NORTHEAST_VERTEX, NORTHEAST);
-	if (EAST_IS_VALID) generate_node(EAST_VERTEX, EAST);
+	if (EAST_IS_VALID) 		generate_node(EAST_VERTEX, EAST);
 	if (SOUTHEAST_IS_VALID) generate_node(SOUTHEAST_VERTEX, SOUTHEAST);
-	if (SOUTH_IS_VALID)  generate_node(SOUTH_VERTEX, SOUTH);
+	if (SOUTH_IS_VALID)  	generate_node(SOUTH_VERTEX, SOUTH);
 	if (SOUTHWEST_IS_VALID) generate_node(SOUTHWEST_VERTEX, SOUTHWEST);
-
-
 	return 0;
 }
 
-int Graph::dijkstra() {
+int Graph::dijkstra(int vertex) {
 	return 0;
 };
 
