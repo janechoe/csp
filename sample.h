@@ -64,27 +64,29 @@ class Graph {
 		int reset_graph();
 		int update_graph(int);
 		int generate_node(int, char);
+		int pick_starting_vertex();
 		int connect_nodes() {
 			return 0;
 		};
-		vector<int> prev_vertex; 
-		vector<float> distance;
-		vector<bool>  was_visited;
+		vector<int>   prev_vertex; 
+		vector<float> distance_from_source;
+		vector<bool>  was_processed;
+		vector<int>	  neighbours;
+		vector<float> distance_to_neighbour;
+		int update_neighbours(int);	
 		//	NW	N   NE
 		//	W 	i 	E
 		// 	SW 	S 	SE
-		//  graph[[W],[NW],[N],[NE],[E],[SW],[S],[SE],[i]]
+		//  graph[[SELF],[W],[NW],[N],[NE],[E],[SW],[S],[SE],[i]]
 		vector<vector<float> > graph;
 
 	public:
 		 int print_graph();
 		 int set_floor(Floor);
 		 int find_route();
-		 int dijkstra(int); 
+		 int dijkstra(); 
 		 Graph() {};
-		~Graph() {
-			cout << "Deleting a graph object" << endl;
-		};
+		~Graph() {};
 };
 
 int Graph::reset_graph() {
@@ -98,31 +100,39 @@ int Graph::reset_graph() {
 int Graph::set_floor(Floor f) {
 	current_floor = f;
 	prev_vertex = vector<int> (AREA, -1);
-	distance = vector<float> (AREA, inf);
-	was_visited = vector<bool> (AREA, false);
-	distance[0] = 0;
+	distance_from_source = vector<float> (AREA, inf);
+	was_processed = vector<bool> (AREA, false);
+	distance_from_source[0] = 0;
 	prev_vertex[0] = 0;	
 	//process a vector of 9xAREA
 	for (int i = 0; i < 9; i++) {
 		graph.push_back(vector<float>(AREA, 0) );
 	}
+	neighbours = vector<int> (9,-1);
+	distance_to_neighbour = vector<float> (9);
+	for(int direction = 0; direction < 9; direction++) {
+		distance_to_neighbour = (direction%2) ? 1 : 1.414;
+	}
+	
 	return 0;
 }
 
 int Graph::find_route(){
-	for(int vertex = 0; vertex <= AREA-1; vertex++) {
-		if (SELF_COLOR) {
-			reset_graph();
-			update_graph(vertex);
-			dijkstra(vertex);			
-		}
-	}
-	cout << "voila" << endl;
+	// for(int vertex = 0; vertex <= AREA-1; vertex++) {
+	// 	// cout << vertex << "\t";
+	// 	// if ( ((vertex+1) % WIDTH) == 0 ) {
+	// 	// 	cout << "\n\v";
+	// 	// }
+	// 	if (SELF_COLOR) {
+	// 		reset_graph();
+	// 		update_graph(vertex);
+			dijkstra();			
+	// 	}
+	// } cout << endl;
 	return 0;
 };
 
 int Graph::generate_node(int vertex, char dir) {
-	// cout << "generate graph called with vertex " << vertex ;
 	if (WEST_IS_VALID) 		graph[dir][WEST_VERTEX] 	 = 1;
 	if (NORTHWEST_IS_VALID) graph[dir][NORTHWEST_VERTEX] = 1.414;
 	if (NORTH_IS_VALID) 	graph[dir][NORTH_VERTEX] 	 = 1;
@@ -135,8 +145,6 @@ int Graph::generate_node(int vertex, char dir) {
 };
 
 int Graph::update_graph(int vertex) {
-	cout << vertex << endl;
-	// cout << endl << "update_graph called with vertex = " << vertex << " for row = "<< ROW << " and col = " << COL << endl;
 	generate_node(vertex, CENTER);
 	if (WEST_IS_VALID) 		generate_node(WEST_VERTEX, WEST);	
 	if (NORTHWEST_IS_VALID) generate_node(NORTHWEST_VERTEX, NORTHWEST);
@@ -149,7 +157,19 @@ int Graph::update_graph(int vertex) {
 	return 0;
 }
 
-int Graph::dijkstra(int vertex) {
+int Graph::dijkstra() {
+	for( int count = 0; count < AREA; count++ ) {
+		update_neighbours(count);
+		// int starting_vertex = pick_starting_vertex();
+		//update the distance for the neighbours
+		// for(int vertex = 0; vertex < AREA; vertex++) {
+		// 	update_graph();
+		// 	update_neighbours();
+		// 	if ( !was_processed[vertex] && graph[starting_vertex][vertex] && (distance_from_source[starting_vertex] != inf) && (distance_from_source[starting_vertex] + graph[starting_vertex][vertex] < distance_from_source[vertex]) ) {
+		// 		distance_from_source[vertex] = distance_from_source[starting_vertex] + graph[starting_vertex][vertex];
+		// 	}
+		// }
+	}
 	return 0;
 };
 
@@ -164,6 +184,35 @@ int Graph::print_graph() {
 	return 0;	
 }
 
+//pick the minimum distance vertex from the list of vertices not yet processed
+int Graph::pick_starting_vertex() {
+	int minimum_distance = inf;
+	int minimum_distance_vertex;
+	for (int vertex = 0; vertex < AREA; vertex++) {
+		if ( (was_processed[vertex] == false) && (distance_from_source[vertex] < minimum_distance) ) {
+			cout << "\tcondition true" << endl;
+			minimum_distance = distance_from_source[vertex];
+			minimum_distance_vertex = vertex;
+		}
+	}
+	cout << minimum_distance_vertex << endl;
+	was_processed[minimum_distance_vertex] = true;
+	return minimum_distance_vertex;
+}
+
+int Graph::update_neighbours(int vertex) {
+	cout << "update_neighbours called with vertex " << vertex << endl;
+	neighbours[0] = 0;
+	if (WEST_IS_VALID) 		neighbours[WEST] 		= WEST_VERTEX;	
+	if (NORTHWEST_IS_VALID) neighbours[NORTHWEST] 	= NORTHWEST_VERTEX;
+	if (NORTH_IS_VALID) 	neighbours[NORTH] 		= NORTH_VERTEX;
+	if (NORTHEAST_IS_VALID) neighbours[NORTHEAST] 	= NORTHEAST_VERTEX;
+	if (EAST_IS_VALID) 		neighbours[EAST] 		= EAST_VERTEX;
+	if (SOUTHEAST_IS_VALID) neighbours[SOUTHEAST]	= SOUTHEAST_VERTEX;
+	if (SOUTH_IS_VALID)  	neighbours[SOUTH] 		= SOUTH_VERTEX;
+	if (SOUTHWEST_IS_VALID) neighbours[SOUTHWEST] 	= SOUTHWEST_VERTEX;
+	return 0;
+}
 #endif
 
 

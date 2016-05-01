@@ -69,6 +69,10 @@ int Floor::get_tile_color(int row, int col) {
     return tiles[row][col].color;
 }
 int Floor::dummy(){
-    cout << "dummies " << endl;
+    for (int row = 0 ; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            cout << get_tile_color(row, col) << "\t";
+        } cout << endl;
+    }
 }
 #endif

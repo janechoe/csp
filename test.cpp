@@ -11,7 +11,8 @@ int main() {
     Floor f;
     f.set_values("sample.txt");
     Graph g;
-    g.set_floor(f);
-    g.find_route();
+    // g.set_floor(f);
+    f.dummy();
+    // g.find_route();
     return 0;
 }
