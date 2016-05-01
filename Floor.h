@@ -7,7 +7,7 @@
 using namespace std;
 
 class Floor {
-    friend class Graph;
+    // friend class Graph;
     private:
         int width, height;
         struct Tile{        /* each unit of the floor is modelled as a tile */
@@ -27,6 +27,7 @@ class Floor {
         int get_height();
         int get_area();
         int get_tile_color(int, int);
+        int dummy();
            
     public:
         Floor()  {};
@@ -49,6 +50,8 @@ int Floor::set_values(const char *filename) {
             tiles[i][j] = tile; 
         } 
     }
+    colorFile.close();
+    return 0;
 }
 int Floor::get_width() {
     return width;
@@ -64,5 +67,8 @@ int Floor::set_color(int row, int col, int c) {
 }
 int Floor::get_tile_color(int row, int col) {
     return tiles[row][col].color;
+}
+int Floor::dummy(){
+    cout << "dummies " << endl;
 }
 #endif

@@ -2,26 +2,18 @@
 #include <fstream>
 #include <vector>
 #include "Floor.h"
-#include "test.h"
+#include "sample.h"
 
 using namespace std;
-
-#define width(f) {}
-#define WEST(vertex, width) {vertex}
-#define NORTH(vertex, width) {vertex-width}
 
 int main() {
     //initiate the floor
     Floor f;
-    f.set_values("sample.txt");
-    cout << f.get_width() << endl; 
-    cout << f.get_height() << endl;
+    f.set_values("sample2.txt");
     Graph g;
-    g.set_floor(f);
-    g.dijkstra();
-    vector<float> dist = g.dijkstra();
-    for(int i = 0; i < f.get_width()*f.get_height(); i++) {
-    	cout << dist[i] << "\t";
-    } 
+    g.set_floor(&f);
+    cout << "before the find_route is called" << &f << endl;
+    g.find_route();
+    cout << "after the find_route is called " << &f << &g << endl;
     return 0;
 }
