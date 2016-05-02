@@ -1,0 +1,42 @@
+last_diagonal_vertex0
+starting_vertex 0
+
+last_diagonal_vertex11
+starting_vertex 1
+
+last_diagonal_vertex11
+starting_vertex 10
+
+last_diagonal_vertex11
+starting_vertex 11
+
+last_diagonal_vertex22
+starting_vertex 2
+
+last_diagonal_vertex22
+starting_vertex 20
+
+last_diagonal_vertex22
+starting_vertex 12
+
+last_diagonal_vertex22
+starting_vertex 21
+
+last_diagonal_vertex22
+starting_vertex 22
+
+last_diagonal_vertex33
+starting_vertex 3
+
+last_diagonal_vertex33
+starting_vertex 30
+
+last_diagonal_vertex33
+starting_vertex 13
+
+last_diagonal_vertex33
+starting_vertex 31
+
+last_diagonal_vertex33
+starting_vertex 32
+
