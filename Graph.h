@@ -5,6 +5,8 @@
 #include "Floor.h"
 #include <limits>
 #include <iostream>
+#include <math.h>
+#include <algorithm>
 
 #define inf std::numeric_limits<float>::infinity()
 
@@ -57,13 +59,15 @@ class Graph {
 
 	private: 
 		Floor current_floor;
-		int pick_starting_vertex();
 		vector<int>   prev_vertex; 
 		vector<float> distance_from_source;
 		vector<bool>  was_processed;
 		vector<int>	  neighbours = vector<int> (9,-1);
 		vector<float> distance_to_neighbour = vector<float> (9);
+		vector<float> queue;
+		int queue_size;
 		float last_minimum_distance = 0;
+		int start_count = 0;
 		int update_neighbours_info(int);
 		void see_stuff();
 
@@ -79,10 +83,10 @@ int Graph::set_floor(Floor f) {
 	prev_vertex = vector<int> (AREA, -1);
 	distance_from_source = vector<float> (AREA, inf);
 	was_processed = vector<bool> (AREA, false);
+	queue.push_back(0);
+	queue_size = 1;
 	distance_from_source[0] = 0;
 	prev_vertex[0] = 0;	
-	// neighbours = vector<int> (9,-1);
-	// distance_to_neighbour = vector<float> (9);
 	return 0;
 }
 
@@ -90,56 +94,49 @@ int Graph::set_floor(Floor f) {
 
 int Graph::dijkstra() {
 	int last_start = 0;
-	for( int vertex = 0; vertex < AREA-1; vertex++ ) {
-		// cout << vertex << endl;
-		see_stuff();
-		if (SELF_COLOR) {
-			int starting_vertex = pick_starting_vertex();
-			last_start = starting_vertex;
+	for( int iteration = 0; iteration <= queue_size; iteration++ ) {
+		cout << " iteration : " << iteration << endl;
+		int starting_vertex = queue[iteration];	
+		int row = starting_vertex/WIDTH;
+		int col = starting_vertex%WIDTH;
+		if (COLOR(row, col)) {
 			was_processed[starting_vertex] = true;
 			update_neighbours_info(starting_vertex);
 			for(int direction = 1; direction <= 8; direction++) {
 				if ( (neighbours[direction] != -1) && !was_processed[neighbours[direction]] 
-					&& ( (distance_from_source[starting_vertex]+distance_to_neighbour[direction]) <= /* rem probable error */ distance_from_source[neighbours[direction]]) ) {
+					&& ( (distance_from_source[starting_vertex]+distance_to_neighbour[direction]) < distance_from_source[neighbours[direction]]) ) {
 					distance_from_source[neighbours[direction]] = distance_from_source[starting_vertex] + distance_to_neighbour[direction];
-					prev_vertex[neighbours[direction]] = starting_vertex;	
+					prev_vertex[neighbours[direction]] = starting_vertex;
+					int location = -1;
+					for(int i = iteration; i < queue_size; i++) {
+						if (queue[i] == neighbours[direction]) {
+							location = i; 
+							break;
+						}
+					}
+					if (location == -1) {
+						queue.push_back(neighbours[direction]);
+						++queue_size;
+						location = queue_size;
+					}
+					for(int i = queue_size-1; i > 0; i--) {
+						if ( distance_from_source[queue[i-1]] < distance_from_source[queue[i]]) {
+							break;
+						} else {
+							swap(queue[i-1], queue[i]);
+						}
+					}
 				}		
 			}
 		}
 	}
-	// see_stuff();
 	return 0;
 };
 
-//pick the minimum distance vertex from the list of vertices not yet processed
-int Graph::pick_starting_vertex() {
-	float minimum_distance = inf;
-	int minimum_distance_vertex;
-	// a version that works
-	for (int vertex = 0; vertex < AREA-1; vertex++) {
-		if ( SELF_COLOR && (was_processed[vertex] == false) && (distance_from_source[vertex] < minimum_distance) ) {
-			minimum_distance = distance_from_source[vertex];
-			minimum_distance_vertex = vertex;
-		}
-	}
-
-	//trying an optimization
-	// for (int vertex = 0; vertex < AREA-1; vertex++) {
-	// 	if ( SELF_COLOR && (was_processed[vertex] == false) && (distance_from_source[vertex] <= last_minimum_distance) ) {
-	// 		last_minimum_distance = distance_from_source[vertex];
-	// 		was_processed[minimum_distance_vertex] = true;
-	// 		return minimum_distance_vertex;
-	// 	}
-	// }	
-	// part of the solution that already works
-	was_processed[minimum_distance_vertex] = true;
-	last_minimum_distance = distance_from_source[minimum_distance_vertex];
-	return minimum_distance_vertex;
-}
 
 int Graph::update_neighbours_info(int vertex) {
 	neighbours[0] = vertex;
-	if (WEST_IS_VALID) {
+	if (WEST_IS_VALID ) {
 		neighbours[WEST] = WEST_VERTEX;
 		distance_to_neighbour[WEST]	= 1; 
 	} else {
@@ -148,7 +145,7 @@ int Graph::update_neighbours_info(int vertex) {
 	}
 	if (NORTHWEST_IS_VALID) {
 		neighbours[NORTHWEST] = NORTHWEST_VERTEX;
-		distance_to_neighbour[NORTHWEST]= 1; 
+		distance_to_neighbour[NORTHWEST]= 1.414; 
 	} else {
 		neighbours[NORTHWEST] = -1;
 		distance_to_neighbour[NORTHWEST] = 0;
@@ -162,7 +159,7 @@ int Graph::update_neighbours_info(int vertex) {
 	}
 	if (NORTHEAST_IS_VALID) {
 		neighbours[NORTHEAST] = NORTHEAST_VERTEX;
-		distance_to_neighbour[NORTHEAST]	= 1; 
+		distance_to_neighbour[NORTHEAST]	= 1.414; 
 	} else {
 		neighbours[NORTHEAST] = -1;
 		distance_to_neighbour[NORTHEAST] = 0;
@@ -176,7 +173,7 @@ int Graph::update_neighbours_info(int vertex) {
 	}
 	if (SOUTHEAST_IS_VALID) {
 		neighbours[SOUTHEAST] = SOUTHEAST_VERTEX;
-		distance_to_neighbour[SOUTHEAST]= 1; 
+		distance_to_neighbour[SOUTHEAST]= 1.414; 
 	} else {
 		neighbours[SOUTHEAST] = -1;
 		distance_to_neighbour[SOUTHEAST] = 0;
@@ -190,7 +187,7 @@ int Graph::update_neighbours_info(int vertex) {
 	}
 	if (SOUTHWEST_IS_VALID) {
 		neighbours[SOUTHWEST] = SOUTHWEST_VERTEX;
-		distance_to_neighbour[SOUTHWEST]	= 1; 
+		distance_to_neighbour[SOUTHWEST]	= 1.414; 
 	} else {
 		neighbours[SOUTHWEST] = -1;
 		distance_to_neighbour[SOUTHWEST] = 0;
@@ -199,18 +196,41 @@ int Graph::update_neighbours_info(int vertex) {
 }
 
 void Graph::see_stuff() {
-	cout << endl;
-    // for (int row = 0 ; row < HEIGHT; row++) {
-    //     for (int col = 0; col < WIDTH; col++) {
-    //         cout << (row * WIDTH + col) << "\t";
-    //     } cout << "\v" << endl;
-    // } cout << endl;
+    // the maze
     for (int row = 0 ; row < HEIGHT; row++) {
         for (int col = 0; col < WIDTH; col++) {
-            // cout << prev_vertex[row * WIDTH + col] << "\t";
-            cout << was_processed[row * WIDTH + col] << "\t";
+            cout << current_floor.get_tile_color(row, col) << "\t";
         } cout << "\v" << endl;
     } cout << endl;
+
+	// vertex numbers
+    for (int row = 0 ; row < HEIGHT; row++) {
+        for (int col = 0; col < WIDTH; col++) {
+            cout << (row * WIDTH + col) << "\t";
+        } cout << "\v" << endl;
+    } cout << endl;
+
+	// prev_vertex
+    for (int row = 0 ; row < HEIGHT; row++) {
+        for (int col = 0; col < WIDTH; col++) {
+            cout << prev_vertex[(row * WIDTH + col)] << "\t";
+        } cout << "\v" << endl;
+    } cout << endl;
+
+	// distance from source
+    for (int row = 0 ; row < HEIGHT; row++) {
+        for (int col = 0; col < WIDTH; col++) {
+            cout << distance_from_source[(row * WIDTH + col)] << "\t";
+        } cout << "\v" << endl;
+    } cout << endl;
+
+	// traversal pattern
+    // for (int row = 0 ; row < HEIGHT; row++) {
+    //     for (int col = 0; col < WIDTH; col++) {
+    //         // cout << prev_vertex[row * WIDTH + col] << "\t";
+    //         cout << was_processed[row * WIDTH + col] << "\t";
+    //     } cout << "\v" << endl;
+    // } cout << endl;
 
 }
 #endif
