@@ -130,6 +130,7 @@ int Graph::dijkstra() {
 			}
 		}
 	}
+	see_stuff();
 	return 0;
 };
 
