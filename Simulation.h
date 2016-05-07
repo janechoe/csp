@@ -19,4 +19,5 @@ int init_agents(max_agents){
     }
 }
 
-#endif // SIMULATION_H_INCLUDED
+#endif 
+// SIMULATION_H_INCLUDED
