@@ -12,20 +12,18 @@
 */
 class Agent {
 private:
-    int mass;
-    int radius;
+    float mass;
+    float radius;
+    struct position { float x; float y;};
+    struct velocity { float x; float y;};
 public:
-    Agent(int r, int m) {
-        radius = r;
-        mass  = m;
-    }
-    struct {
-        int x;
-        int y;
-    } position;
-    struct {
-        float x;
-        float y;
-    } velocity;
+    Agent(){};
+    ~Agent(){};
+    int set_values();
 };
+
+int Agent::set_values(int x, int y, float vx, float vy, float m, float r) {
+    mass = m; radius = r; position.x = x; position.y = y; velocity.x = vx; velocity.y = vy;
+    return 0;
+}
 #endif
