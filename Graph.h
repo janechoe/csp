@@ -23,14 +23,23 @@
 // #define COLOR(...) GET_MACRO(__VA_ARGS__, COLOR2, COLOR1)(__VA_ARGS__)
 //http://stackoverflow.com/questions/11761703/overloading-macro-on-number-of-arguments
 
-#define WEST_IS_VALID  (COL > 0 && COLOR(ROW,COL-1)  )
-#define NORTH_IS_VALID (ROW > 0 && COLOR(ROW-1,COL) )
-#define EAST_IS_VALID  (COL < WIDTH-1 && COLOR(ROW,COL+1)  )
-#define SOUTH_IS_VALID (ROW < HEIGHT-1 && COLOR(ROW+1,COL) )
-#define NORTHWEST_IS_VALID ( ROW > 0 && COL > 0 && COLOR(ROW-1,COL-1) )
-#define NORTHEAST_IS_VALID ( ROW > 0 && COL < WIDTH-1  && COLOR(ROW-1,COL+1) )
-#define SOUTHEAST_IS_VALID ( ROW < HEIGHT-1 && COL < WIDTH-1 && COLOR(ROW+1,COL+1) )
-#define SOUTHWEST_IS_VALID ( ROW < HEIGHT-1 && COL > 0 && COLOR(ROW+1,COL-1) )
+#define WEST_IS_VALID  (col > 0 && COLOR(row,col-1) )
+#define NORTH_IS_VALID (row > 0 && COLOR(row-1,col) )
+#define EAST_IS_VALID  (col < WIDTH-1 && COLOR(row,col+1)  )
+#define SOUTH_IS_VALID (row < HEIGHT-1 && COLOR(row+1,col) )
+#define NORTHWEST_IS_VALID ( row > 0 && col > 0 && COLOR(row-1,col-1) )
+#define NORTHEAST_IS_VALID ( row > 0 && col < WIDTH-1  && COLOR(row-1,col+1) )
+#define SOUTHEAST_IS_VALID ( row < HEIGHT-1 && col < WIDTH-1 && COLOR(row+1,col+1) )
+#define SOUTHWEST_IS_VALID ( row < HEIGHT-1 && col > 0 && COLOR(row+1,col-1) )
+
+#define WEST_EXISTS  ((col > 0 ))
+#define NORTH_EXISTS ((row > 0 ))
+#define EAST_EXISTS  ((col < WIDTH-1))
+#define SOUTH_EXISTS ((row < HEIGHT-1))
+#define NORTHWEST_EXISTS (( row > 0 && col > 0 ))
+#define NORTHEAST_EXISTS (( row > 0 && col < WIDTH-1))
+#define SOUTHEAST_EXISTS (( row < HEIGHT-1 && col < WIDTH-1))
+#define SOUTHWEST_EXISTS (( row < HEIGHT-1 && col > 0 ))
 
 #define WEST_VERTEX  ( vertex-1 )
 #define NORTH_VERTEX ( vertex-WIDTH )
@@ -68,7 +77,10 @@ class Graph {
 		int queue_size;
 		float last_minimum_distance = 0;
 		int start_count = 0;
-		int update_neighbours_info(int);
+		int update_neighbours_info(int 	/* 	neighbours[direction] */);
+		int update_desired_direction(int /* neighbours[direction]*/);
+		int process_wall_force(int, int);
+		int update_queue(int, int);
 		void see_stuff();
 
 	public:
@@ -95,49 +107,66 @@ int Graph::set_floor(Floor f) {
 int Graph::dijkstra() {
 	int last_start = 0;
 	for( int iteration = 0; iteration <= queue_size; iteration++ ) {
-		cout << " iteration : " << iteration << endl;
+		// cout << " iteration : " << iteration << endl;
 		int starting_vertex = queue[iteration];	
 		int row = starting_vertex/WIDTH;
 		int col = starting_vertex%WIDTH;
-		if (COLOR(row, col)) {
-			was_processed[starting_vertex] = true;
-			update_neighbours_info(starting_vertex);
-			for(int direction = 1; direction <= 8; direction++) {
-				if ( (neighbours[direction] != -1) && !was_processed[neighbours[direction]] 
-					&& ( (distance_from_source[starting_vertex]+distance_to_neighbour[direction]) < distance_from_source[neighbours[direction]]) ) {
-					distance_from_source[neighbours[direction]] = distance_from_source[starting_vertex] + distance_to_neighbour[direction];
-					prev_vertex[neighbours[direction]] = starting_vertex;
-					int location = -1;
-					for(int i = iteration; i < queue_size; i++) {
-						if (queue[i] == neighbours[direction]) {
-							location = i; 
-							break;
-						}
-					}
-					if (location == -1) {
-						queue.push_back(neighbours[direction]);
-						++queue_size;
-						location = queue_size;
-					}
-					for(int i = queue_size-1; i > 0; i--) {
-						if ( distance_from_source[queue[i-1]] < distance_from_source[queue[i]]) {
-							break;
-						} else {
-							swap(queue[i-1], queue[i]);
-						}
-					}
-				}		
-			}
+		was_processed[starting_vertex] = true;
+		update_neighbours_info(starting_vertex);
+		process_wall_force(row, col);
+		// current_floor.normalize_wall_force(row, col);
+		for(int direction = WEST; direction <= SOUTHWEST; direction++) {
+			if ( (neighbours[direction] != -1) && !was_processed[neighbours[direction]] 
+				&& ( (distance_from_source[starting_vertex]+distance_to_neighbour[direction]) < distance_from_source[neighbours[direction]]) ) {
+				distance_from_source[neighbours[direction]] = distance_from_source[starting_vertex] + distance_to_neighbour[direction];
+				
+				// uncomment to get the vertex number of previous vertex 
+				// on the shortest path
+				// prev_vertex[neighbours[direction]] = starting_vertex;
+				
+				// update the desired direction for an agent
+				// on a tile to the tile closer to the exit 
+				// on the shortest path
+				update_desired_direction(direction);
+
+				//update the queue with the processed vertex
+				update_queue(iteration, neighbours[direction]);
+			}		
 		}
 	}
 	see_stuff();
 	return 0;
 };
 
+int Graph::update_queue(int iteration, int neighbour) {
+	int location = -1;
+	for(int i = iteration; i < queue_size; i++) {
+		if (queue[i] == neighbour) {
+			location = i; 
+			break;
+		}
+	}
+	if (location == -1) {
+		queue.push_back(neighbour);
+		++queue_size;
+		location = queue_size;
+	} else {
+		for(int i = queue_size-1; i > 0; i--) {
+			if ( distance_from_source[queue[i-1]] < distance_from_source[queue[i]]) {
+				break;
+			} else {
+				swap(queue[i-1], queue[i]);
+			}
+		}
+	}
+}
+
 
 int Graph::update_neighbours_info(int vertex) {
-	neighbours[0] = vertex;
-	if (WEST_IS_VALID ) {
+	// neighbours[0] = vertex;
+	int row = vertex/current_floor.width;
+	int col = vertex%current_floor.width;
+	if (WEST_IS_VALID) {
 		neighbours[WEST] = WEST_VERTEX;
 		distance_to_neighbour[WEST]	= 1; 
 	} else {
@@ -196,6 +225,37 @@ int Graph::update_neighbours_info(int vertex) {
 	return 0;
 }
 
+int Graph::process_wall_force(int row, int col) {
+	if (COLOR(row, col)) {
+		if (WEST_EXISTS 	 &&	!COLOR(row 	, col-1) ) 	current_floor.set_wall_force(row, col, 1, 0);
+		if (NORTHWEST_EXISTS && !COLOR(row-1, col-1) ) 	current_floor.set_wall_force(row, col, 1, 1);
+		if (NORTH_EXISTS 	 && !COLOR(row-1, col  ) ) 	current_floor.set_wall_force(row, col, 0, 1);
+		if (NORTHEAST_EXISTS && !COLOR(row-1, col+1) ) 	current_floor.set_wall_force(row, col,-1, 1);
+		if (EAST_EXISTS 	 &&	!COLOR(row  , col+1) ) 	current_floor.set_wall_force(row, col,-1, 0);
+		if (SOUTHEAST_EXISTS && !COLOR(row+1, col+1) ) 	current_floor.set_wall_force(row, col,-1,-1);
+		if (SOUTH_EXISTS 	 && !COLOR(row+1, col  ) ) 	current_floor.set_wall_force(row, col, 0,-1);
+		if (SOUTHWEST_EXISTS && !COLOR(row+1, col-1) ) 	current_floor.set_wall_force(row, col, 1,-1);
+		// current_floor.normalize_wall_force(row, col);
+	};
+	
+	return 0;
+}
+
+
+int Graph::update_desired_direction(int direction) {
+	switch (direction) {
+		case WEST 	  : current_floor.set_direction(neighbours[direction], 1, 0); break;
+		case NORTHWEST: current_floor.set_direction(neighbours[direction], 1, 1); break; 
+		case NORTH 	  : current_floor.set_direction(neighbours[direction], 0, 1); break; 
+		case NORTHEAST: current_floor.set_direction(neighbours[direction],-1, 1); break; 
+		case EAST 	  : current_floor.set_direction(neighbours[direction],-1, 0); break; 
+		case SOUTHEAST: current_floor.set_direction(neighbours[direction],-1,-1); break; 
+		case SOUTH 	  : current_floor.set_direction(neighbours[direction], 0,-1); break; 
+		case SOUTHWEST: current_floor.set_direction(neighbours[direction], 1,-1); break; 
+		default : ;
+	}
+}
+
 void Graph::see_stuff() {
     // the maze
     for (int row = 0 ; row < HEIGHT; row++) {
@@ -204,24 +264,38 @@ void Graph::see_stuff() {
         } cout << "\v" << endl;
     } cout << endl;
 
-	// vertex numbers
+	// // vertex numbers
+ //    for (int row = 0 ; row < HEIGHT; row++) {
+ //        for (int col = 0; col < WIDTH; col++) {
+ //            cout << (row * WIDTH + col) << "\t";
+ //        } cout << "\v" << endl;
+ //    } cout << endl;
+
+	// // prev_vertex
+ //    for (int row = 0 ; row < HEIGHT; row++) {
+ //        for (int col = 0; col < WIDTH; col++) {
+ //            cout << prev_vertex[(row * WIDTH + col)] << "\t";
+ //        } cout << "\v" << endl;
+ //    } cout << endl;
+
+	// // distance from source
+ //    for (int row = 0 ; row < HEIGHT; row++) {
+ //        for (int col = 0; col < WIDTH; col++) {
+ //            cout << distance_from_source[(row * WIDTH + col)] << "\t";
+ //        } cout << "\v" << endl;
+ //    } cout << endl;
+
+	cout <<  "direction to go" << endl;
     for (int row = 0 ; row < HEIGHT; row++) {
         for (int col = 0; col < WIDTH; col++) {
-            cout << (row * WIDTH + col) << "\t";
+            cout << "(" << current_floor.tiles[row][col].desired_direction_in_x << "," <<current_floor.tiles[row][col].desired_direction_in_y <<")" << "\t";
         } cout << "\v" << endl;
     } cout << endl;
 
-	// prev_vertex
+	cout << "wall force" << endl;
     for (int row = 0 ; row < HEIGHT; row++) {
         for (int col = 0; col < WIDTH; col++) {
-            cout << prev_vertex[(row * WIDTH + col)] << "\t";
-        } cout << "\v" << endl;
-    } cout << endl;
-
-	// distance from source
-    for (int row = 0 ; row < HEIGHT; row++) {
-        for (int col = 0; col < WIDTH; col++) {
-            cout << distance_from_source[(row * WIDTH + col)] << "\t";
+            cout << "(" << current_floor.tiles[row][col].wall_force_in_x << "," << current_floor.tiles[row][col].wall_force_in_y <<")" << "\t";
         } cout << "\v" << endl;
     } cout << endl;
 
