@@ -12,18 +12,21 @@
 */
 class Agent {
 private:
+    bool active;
     float mass;
     float radius;
     struct position { float x; float y;};
     struct velocity { float x; float y;};
+    struct repulsion_force { float x; float y;};
 public:
-    Agent(){};
+    Agent():active{1}{};
     ~Agent(){};
-    int set_values();
+    int set_values(float, float, float, float, float, float);
+    // int calculate_repulsion();
 };
 
-int Agent::set_values(int x, int y, float vx, float vy, float m, float r) {
-    mass = m; radius = r; position.x = x; position.y = y; velocity.x = vx; velocity.y = vy;
+int Agent::set_values(float x, float y, float vx, float vy, float m, float r) {
+    position{x,y}; velocity{vx, vy}; mass = m; radius = r; 
     return 0;
 }
 #endif

@@ -9,18 +9,29 @@ using namespace std;
 class Simulation {
 	private:
     	vector <Agent> agents;
+        int max_agents;
     public:
-    	int init_agents(int);
-    	Simulation();
-    	~Simulation();
+    	int set_values(int);
+    	int calculate_agents_repulsion();
+    	Simulation(){};
+    	~Simulation(){};
 };
 
-int init_agents(max_agents){
-    for (int i=0; i < max_agents; i++){
-        Agent single_agent;
-        single_agent.set_values(x,y,vx,vy,m,r);
-        agents.push_back(agent);
+int Simulation::set_values(int m){
+    max_agents = m;
+    for (int agent_count=0; agent_count < max_agents; agent_count++){
+        Agent agent;
+        // agent.set_values(x,y,vx,vy,m,r);
+        // agents.push_back(agent);
     }
+}
+
+int Simulation::calculate_agents_repulsion() {
+    //figure out a way to include max agents in the 
+	for (int agent_count = 0; agent_count < max_agents; agent_count++) {
+		Agent agent = agents[agent_count];
+		// agent.calculate_repulsion();
+	}
 }
 
 #endif 
