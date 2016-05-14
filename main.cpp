@@ -9,21 +9,22 @@ using namespace std;
 
 int main() {
     //initiate the floor
-    Floor f;
+    Floor ground_floor;
     // f.set_values("erb1_pixelValues.txt");
-    f.set_values("sample.txt");
+    ground_floor.set_values("sample.txt");
     Graph g;
-    g.set_floor(f);
+    g.set_floor(ground_floor);
     g.dijkstra();
 
     // preprocessing ends here //
 
     // runtime functions //
-    int max_agents = 250;
+    int max_agents = 1;
     Simulation s;
-    s.set_values(max_agents);
+    s.set_values(ground_floor, max_agents);
     // s.calculate_agents_repulsion();
-
+    s.initiate_agent_position_files();
+    s.update_agents_position();
     // get the values
     // process the values -> solve the differential equation
     // write to text files

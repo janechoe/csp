@@ -122,7 +122,7 @@ int Graph::dijkstra() {
 				
 				// uncomment to get the vertex number of previous vertex 
 				// on the shortest path
-				// prev_vertex[neighbours[direction]] = starting_vertex;
+				prev_vertex[neighbours[direction]] = starting_vertex;
 				
 				// update the desired direction for an agent
 				// on a tile to the tile closer to the exit 
@@ -264,40 +264,40 @@ void Graph::see_stuff() {
         } cout << "\v" << endl;
     } cout << endl;
 
-	// // vertex numbers
+	// cout << " vertex numbers " << endl;
  //    for (int row = 0 ; row < HEIGHT; row++) {
  //        for (int col = 0; col < WIDTH; col++) {
  //            cout << (row * WIDTH + col) << "\t";
  //        } cout << "\v" << endl;
  //    } cout << endl;
 
-	// // prev_vertex
+	// cout << "previous vertex" << endl;
  //    for (int row = 0 ; row < HEIGHT; row++) {
  //        for (int col = 0; col < WIDTH; col++) {
  //            cout << prev_vertex[(row * WIDTH + col)] << "\t";
  //        } cout << "\v" << endl;
  //    } cout << endl;
 
-	// // distance from source
+	// cout << " distance from source " << endl;
  //    for (int row = 0 ; row < HEIGHT; row++) {
  //        for (int col = 0; col < WIDTH; col++) {
  //            cout << distance_from_source[(row * WIDTH + col)] << "\t";
  //        } cout << "\v" << endl;
  //    } cout << endl;
 
-	cout <<  "direction to go" << endl;
-    for (int row = 0 ; row < HEIGHT; row++) {
-        for (int col = 0; col < WIDTH; col++) {
-            cout << "(" << current_floor.tiles[row][col].desired_direction_in_x << "," <<current_floor.tiles[row][col].desired_direction_in_y <<")" << "\t";
-        } cout << "\v" << endl;
-    } cout << endl;
+	// cout <<  "direction to go" << endl;
+ //    for (int row = 0 ; row < HEIGHT; row++) {
+ //        for (int col = 0; col < WIDTH; col++) {
+ //            cout << "(" << current_floor.tiles[row][col].desired_direction_in_x << "," <<current_floor.tiles[row][col].desired_direction_in_y <<")" << "\t";
+ //        } cout << "\v" << endl;
+ //    } cout << endl;
 
-	cout << "wall force" << endl;
-    for (int row = 0 ; row < HEIGHT; row++) {
-        for (int col = 0; col < WIDTH; col++) {
-            cout << "(" << current_floor.tiles[row][col].wall_force_in_x << "," << current_floor.tiles[row][col].wall_force_in_y <<")" << "\t";
-        } cout << "\v" << endl;
-    } cout << endl;
+	// cout << "wall force" << endl;
+ //    for (int row = 0 ; row < HEIGHT; row++) {
+ //        for (int col = 0; col < WIDTH; col++) {
+ //            cout << "(" << current_floor.tiles[row][col].wall_force_in_x << "," << current_floor.tiles[row][col].wall_force_in_y <<")" << "\t";
+ //        } cout << "\v" << endl;
+ //    } cout << endl;
 
 	// traversal pattern
     // for (int row = 0 ; row < HEIGHT; row++) {
