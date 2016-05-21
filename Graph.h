@@ -67,7 +67,7 @@ using namespace std;
 class Graph {
 
 	private: 
-		Floor current_floor;
+		Floor &current_floor;
 		vector<int>   prev_vertex; 
 		vector<float> distance_from_source;
 		vector<bool>  was_processed;
@@ -84,14 +84,13 @@ class Graph {
 		void see_stuff();
 
 	public:
-		 int set_floor(Floor);
+		 int set_floor();
 		 int dijkstra(); 
-		 Graph() {};
+		 Graph(Floor &f):current_floor(f) {};
 		~Graph() {};
 };
 
-int Graph::set_floor(Floor f) {
-	current_floor = f;
+int Graph::set_floor() {
 	prev_vertex = vector<int> (AREA, -1);
 	distance_from_source = vector<float> (AREA, inf);
 	was_processed = vector<bool> (AREA, false);
@@ -134,7 +133,7 @@ int Graph::dijkstra() {
 			}		
 		}
 	}
-	see_stuff();
+	// see_stuff();
 	return 0;
 };
 
@@ -257,10 +256,17 @@ int Graph::update_desired_direction(int direction) {
 }
 
 void Graph::see_stuff() {
-    // the maze
+    cout << "the maze" << endl;
     for (int row = 0 ; row < HEIGHT; row++) {
         for (int col = 0; col < WIDTH; col++) {
             cout << current_floor.get_tile_color(row, col) << "\t";
+        } cout << "\v" << endl;
+    } cout << endl;
+
+    cout << "tiles properties" << endl;
+    for (int row = 0 ; row < HEIGHT; row++) {
+        for (int col = 0; col < WIDTH; col++) {
+            cout << "(" << current_floor.get_tile(row,col).row << "," << current_floor.get_tile(row,col).col << ")"<< "\t";
         } cout << "\v" << endl;
     } cout << endl;
 
@@ -285,12 +291,20 @@ void Graph::see_stuff() {
  //        } cout << "\v" << endl;
  //    } cout << endl;
 
-	// cout <<  "direction to go" << endl;
+	cout <<  "in see_stuff: direction to go" << endl;
+    for (int row = 0 ; row < HEIGHT; row++) {
+        for (int col = 0; col < WIDTH; col++) {
+            cout << "(" << current_floor.tiles[row][col].desired_direction_in_x << "," << current_floor.tiles[row][col].desired_direction_in_y <<")" << "\t";
+        } cout << "\v" << endl;
+    } cout << endl;
+	// cout <<  "testing direction to go" << endl;
  //    for (int row = 0 ; row < HEIGHT; row++) {
  //        for (int col = 0; col < WIDTH; col++) {
- //            cout << "(" << current_floor.tiles[row][col].desired_direction_in_x << "," <<current_floor.tiles[row][col].desired_direction_in_y <<")" << "\t";
+ //            cout << "(" << current_floor.get_tile(row,col).desired_direction_in_x << "," << current_floor.get_tile(row,col).desired_direction_in_y <<")" << "\t";
  //        } cout << "\v" << endl;
  //    } cout << endl;
+ //    cout << current_floor.get_tile(7,7).desired_direction_in_x << current_floor.get_tile(7,7).desired_direction_in_y << endl;
+
 
 	// cout << "wall force" << endl;
  //    for (int row = 0 ; row < HEIGHT; row++) {

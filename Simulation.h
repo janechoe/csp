@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ class Simulation {
         int max_agents;
         Floor current_floor;
     public:
-    	int set_values(Floor, int);
+    	int set_values(Floor&, int);
     	int calculate_agents_repulsion();
         int initiate_agent_position_files();
         int update_agents_position();
@@ -23,14 +24,22 @@ class Simulation {
     	~Simulation(){};
 };
 
-int Simulation::set_values(Floor f, int m){
+int Simulation::set_values(Floor& f, int m){
     current_floor = f;
     max_agents = m;
     for (int agent_count=0; agent_count < max_agents; agent_count++){
         Agent agent;
-        // agent.set_values(x,y,vx,vy,m,r);
-        agent.set_values(current_floor, 7, 7, 0, 0, 85, 3);
+        int x =  rand() % current_floor.width;
+        int y =  rand() % current_floor.height;
+        cout << x << " " << y << endl;
+        while ( (current_floor.get_tile(y, x).color != 3) && (current_floor.get_tile(y,x).agent_number == -1) ) { //get tile expects row, col
+            x = rand() % current_floor.width;
+            y = rand() % current_floor.height;
+        }
+        agent.set_values(current_floor, x, y, 0, 0, 85, 3);
         agents.push_back(agent);
+        current_floor.tiles[y][x].agent_number = agent_count;
+
     } 
 }
 
@@ -53,6 +62,9 @@ int Simulation::initiate_agent_position_files() {
 }
 
 int Simulation::update_agents_position() {
+    
+    initiate_agent_position_files();
+    
     int x; int y;
     string file_name;
     vector <ofstream> agent_files (max_agents); 
@@ -62,26 +74,27 @@ int Simulation::update_agents_position() {
     }
 
     bool active_agent_exists = 1;
-    // while (active_agent_exists) {
+    while (active_agent_exists) {
         active_agent_exists = 0;
         for (int agent_count = 0; agent_count < max_agents; agent_count++) {
-            Agent agent = agents[agent_count];
-            if (agent.active) {
-                active_agent_exists = 1;
-                agent.update_position();
+            // Agent agent = agents[agent_count];    
+            if (agents[agent_count].active) {
+                agents[agent_count].update_acceleration();
+                agents[agent_count].update_velocity();
+                agents[0].update_position();
                 //write the position to a file;
                     file_name = "agent" + to_string(agent_count) + ".csv";
-                    agent_files[agent_count] << agent.position.col << "," << agent.position.row << endl;
+                    agent_files[agent_count] << agents[agent_count].position.col << "," << agents[agent_count].position.row << endl;
                 // check if the agent has reached the source
-                    if ( (agent.position.row == 0) && (agent.position.col == 0) ) {
-                        agent.active = 0;
+                    if ( agents[agent_count].position.color == 1 ) {
+                        agents[agent_count].active = 0;
                         continue;
+                    } else {
+                            active_agent_exists = 1;
                     }
-                agent.update_velocity();
-                agent.update_acceleration();
             }
         }
-    // }
+    }
     return 0;
 }
 

@@ -53,7 +53,7 @@ int Floor::set_values(const char *filename) {
         for(int col = 0; col < width; col++) {
             Tile tile;
             tile.row = row;
-            tile.col = tile.col;
+            tile.col = col;
             colorFile >> tile.color;
             tiles[row][col] = tile; 
         } 
@@ -88,8 +88,8 @@ int Floor::set_wall_force(int row, int col, int xdirection, int ydirection) {
 }
 
 Floor::Tile Floor::get_tile(int row, int col) {
-    Tile tile = tiles[row][col];
-    return tile;
+    // Tile tile = tiles[row][col];
+    return tiles[row][col];
 }
 
 int Floor::normalize_wall_force(int row, int col) {

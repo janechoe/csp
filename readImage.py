@@ -1,5 +1,5 @@
 from PIL import Image
-image = Image.open("erb1modified.png")
+image = Image.open("erb1.png")
 pix  = image.load()
 pix[0,0]
 width, height = image.size
@@ -16,15 +16,18 @@ while y < height:
         # black = 0
         # green = 1
         # white = 2
+        # grey  = 3
         # other = 0
         if ( (color==(0,0,0,255)) or (color == (255, 0, 0, 255)) ):
             print 0
         elif (color ==(0, 255, 0, 255)):
             print 1
-        elif ((color == (255, 255, 255, 255)) or (color == (255, 0, 255, 255)) ):
+        elif ((color == (255, 255, 255, 255)) ):
             print 2
-        else:
+        elif ((color == (255,0,255,255) )):
             print 3
+        else:
+            print 4
         if color not in all_colors:
             all_colors.append(color)
         # print all_colors
