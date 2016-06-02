@@ -30,7 +30,7 @@ String[] s = all_agents.setnames();  // saving the agent names in the string[] s
        TableRow row = table.getRow(i); //taking single row at a time 
        int x = row.getInt(0);
        int y = row.getInt(1);
-       ellipse(x,y,10,10);  //circle of 10 pixels diameter 
+       ellipse(x,y,5,5);  //circle of 10 pixels diameter 
      }
      
   }   

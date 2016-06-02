@@ -133,7 +133,7 @@ int Graph::dijkstra() {
 			}		
 		}
 	}
-	see_stuff();
+	// see_stuff();
 	return 0;
 };
 
